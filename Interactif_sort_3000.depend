@@ -1,0 +1,55 @@
+# depslib dependency file v1.0
+1389442798 source:g:\coding\interaktywna_sortowarka_3000\interaktywnosc.c
+
+1390100147 source:g:\coding\interaktywna_sortowarka_3000\interactif.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
+1390099437 g:\coding\interaktywna_sortowarka_3000\header.h
+
+1216120406 g:\mingw\pdcurs34\\curses.h
+	<stdarg.h>
+	<stddef.h>
+	<stdio.h>
+	<wchar.h>
+
+1390099552 source:g:\coding\interaktywna_sortowarka_3000\main.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
+1390099412 source:g:\coding\interaktywna_sortowarka_3000\sort.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
+1390101723 source:g:\coding\interactif_sort_3000\interactif.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
+1390101624 g:\coding\interactif_sort_3000\header.h
+
+1390101748 source:g:\coding\interactif_sort_3000\main.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
+1390099412 source:g:\coding\interactif_sort_3000\sort.c
+	<curses.h>
+	<windows.h>
+	<assert.h>
+	<string.h>
+	"header.h"
+
