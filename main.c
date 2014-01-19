@@ -45,26 +45,26 @@ void f_draw(char* whatToDraw)
         attroff(COLOR_PAIR(1));
 
         /*Draw main border*/
-        mvwprintw (stdscr, 0, 0, "%c", LUC);
-        mvwprintw (stdscr, HEIGHT - 2, WIDTH - 1, "%c", RLC);
+        mvwprintw (stdscr, 0, 0, "%c", DLUC);
+        mvwprintw (stdscr, HEIGHT - 2, WIDTH - 1, "%c", DRLC);
         wrefresh (stdscr);
         Sleep (DRAWSPEED);
         for (y = 1; y <= HEIGHT - 3; y++)
         {
-            mvwprintw (stdscr, y, 0, "%c", VER);
-            mvwprintw (stdscr, HEIGHT - 2 - y, WIDTH - 1, "%c", VER);
+            mvwprintw (stdscr, y, 0, "%c", DVER);
+            mvwprintw (stdscr, HEIGHT - 2 - y, WIDTH - 1, "%c", DVER);
             wrefresh (stdscr);
             Sleep (DRAWSPEED);
         }
-        mvwprintw (stdscr, HEIGHT - 2, 0, "%c", LLC);
-        mvwprintw (stdscr, 0, WIDTH - 1, "%c", RUC);
+        mvwprintw (stdscr, HEIGHT - 2, 0, "%c", DLLC);
+        mvwprintw (stdscr, 0, WIDTH - 1, "%c", DRUC);
 
         wrefresh (stdscr);
         Sleep (DRAWSPEED);
         for (x = 1; x <= WIDTH - 2; x++)
         {
-            mvwprintw (stdscr, HEIGHT - 2, x, "%c", HOR);
-            mvwprintw (stdscr, 0, WIDTH - 1 - x, "%c", HOR);
+            mvwprintw (stdscr, HEIGHT - 2, x, "%c", DHOR);
+            mvwprintw (stdscr, 0, WIDTH - 1 - x, "%c", DHOR);
             wrefresh(stdscr);
             Sleep (DRAWSPEED);
         }
@@ -109,14 +109,14 @@ void f_draw(char* whatToDraw)
     }
     else if (strcmp (whatToDraw, "line") == 0)
     {
-        mvwprintw (stdscr, 10, 0, "%c", VERR);
-        mvwprintw (stdscr, 10, WIDTH - 1, "%c", VERL);
+        mvwprintw (stdscr, 10, 0, "%c", DVERR);
+        mvwprintw (stdscr, 10, WIDTH - 1, "%c", DVERL);
         wrefresh (stdscr);
         Sleep (DRAWSPEED);
         for (x = 1; x <= WIDTH/2; x++)
         {
-            mvwprintw (stdscr, 10, x, "%c", HOR);
-            mvwprintw (stdscr, 10, WIDTH - x - 1, "%c", HOR);
+            mvwprintw (stdscr, 10, x, "%c", DHOR);
+            mvwprintw (stdscr, 10, WIDTH - x - 1, "%c", DHOR);
             wrefresh (stdscr);
             Sleep (DRAWSPEED);
         }
@@ -133,6 +133,46 @@ void f_draw(char* whatToDraw)
             mvwprintw(interactif_win, charPos.row, charPos.column, "X");
         }
         wrefresh(interactif_win);
+    }
+    else if (strcmp (whatToDraw, "table") == 0)
+    {
+        int x, y;
+        WINDOW* whatWindow = sort_win;
+        init_pair(5, COLOR_WHITE, COLOR_BLUE);
+
+        /*Print separators*/
+        for (y = 0; y <= 1; y++)
+        {
+            mvwprintw (whatWindow, y, 4, "%c", VER) ;
+            mvwprintw (whatWindow, y, 48, "%c", VER);
+            mvwprintw (whatWindow, y, 55, "%c", VER);
+            mvwprintw (whatWindow, y, 64, "%c", VER);
+            wrefresh(whatWindow);
+            Sleep (DRAWSPEED);
+        }
+
+        /*Print lower line*/
+        for (x = 0; x < XMAX; x++)
+        {
+            mvwprintw (whatWindow, 1 ,x ,"%c", HOR);
+        }
+        mvwprintw (whatWindow, 1, 4, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 48, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 55, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 64, "%c", CROSS);
+        wrefresh(whatWindow);
+        Sleep (DRAWSPEED);
+
+        /*Print data body*/
+        for (y = 2; y < YMAX; y++)
+        {
+            mvwprintw (whatWindow, y, 4, "%c", VER);
+            mvwprintw (whatWindow, y, 48, "%c", VER);
+            mvwprintw (whatWindow, y, 55, "%c", VER);
+            mvwprintw (whatWindow, y, 64, "%c", VER);
+            wrefresh(whatWindow);
+            Sleep (DRAWSPEED);
+        }
     }
 }
 /*End of f_draw*/

@@ -1,4 +1,100 @@
-5443	23	YES	123	45.65
-12123	12	NO	112	78.344
-348		8	NO	90	10.1
-12		100	YES	1	77
+NO;Title;Year;Rating;Your Rating
+1;The Shawshank Redemption;1994;9.2;0.0
+2;The Godfather;1972;9.2;0.0
+3;The Godfather: Part II;1974;9.0;0.0
+4;The Dark Knight;2008;8.9;0.0
+5;Pulp Fiction;1994;8.9;0.0
+6;The Good the Bad and the Ugly;1966;8.9;0.0
+7;Schindler's List;1993;8.9;0.0
+8;12 Angry Men;1957;8.9;0.0
+9;The Lord of the Rings: The Return of the King;2003;8.9;0.0
+10;Fight Club;1999;8.8;0.0
+11;The Lord of the Rings: The Fellowship of the Ring;2001;8.8;0.0
+12;Star Wars: Episode V - The Empire Strikes Back;1980;8.8;0.0
+13;Inception;2010;8.7;0.0
+14;One Flew Over the Cuckoo's Nest;1975;8.7;0.0
+15;Forrest Gump;1994;8.7;0.0
+16;Goodfellas;1990;8.7;0.0
+17;The Lord of the Rings: The Two Towers;2002;8.7;0.0
+18;Star Wars: Episode IV - A New Hope;1977;8.7;0.0
+19;The Matrix;1999;8.7;0.0
+20;Seven Samurai;1954;8.7;0.0
+21;City of God;2002;8.7;0.0
+22;Se7en;1995;8.6;0.0
+23;The Usual Suspects;1995;8.6;0.0
+24;Once Upon a Time in the West;1968;8.6;0.0
+25;The Silence of the Lambs;1991;8.6;0.0
+26;It's a Wonderful Life;1946;8.6;0.0
+27;Léon: The Professional;1994;8.6;0.0
+28;Casablanca;1942;8.6;0.0
+29;Raiders of the Lost Ark;1981;8.6;0.0
+30;Life Is Beautiful;1997;8.6;0.0
+31;Rear Window;1954;8.6;0.0
+32;American History X;1998;8.6;0.0
+33;Psycho;1960;8.6;0.0
+34;City Lights;1931;8.5;0.0
+35;Saving Private Ryan;1998;8.5;0.0
+36;Spirited Away;2001;8.5;0.0
+37;Memento;2000;8.5;0.0
+38;Sunset Blvd;(1950;8.5;0.0
+39;The Intouchables;2011;8.5;0.0
+40;Terminator 2: Judgment Day;1991;8.5;0.0
+41;Modern Times;1936;8.5;0.0
+42;Dr Strangelove;1964;8.5;0.0
+43;Apocalypse Now;1979;8.5;0.0
+44;Pianista;2002;8.5;0.0
+45;The Departed;2006;8.5;0.0
+46;The Green Mile;1999;8.5;0.0
+47;The Wolf of Wall Street;2013;8.5;0.0
+48;The Dark Knight Rises;2012;8.5;0.0
+49;Gladiator;2000;8.5;0.0
+50;Back to the Future;1985;8.5;0.0
+51;Alien;1979;8.5;0.0
+52;Django Unchained;2012;8.5;0.0
+53;The Lives of Others;2006;8.5;0.0
+54;The Prestige;2006;8.4;0.0
+55;The Great Dictator;1940;8.4;0.0
+56;The Shining;1980;8.4;0.0
+57;Cinema Paradiso;1988;8.4;0.0
+58;Paths of Glory;1957;8.4;0.0
+59;North by Northwest;1959;8.4;0.0
+60;American Beauty;1999;8.4;0.0
+61;WALL·E;2008;8.4;0.0
+62;Amélie;2001;8.4;0.0
+63;Citizen Kane;1941;8.4;0.0
+64;The Lion King;1994;8.4;0.0
+65;Aliens;1986;8.4;0.0
+66;Toy Story 3;2010;8.4;0.0
+67;Vertigo;1958;8.4;0.0
+68;M;1931;8.4;0.0
+69;Das Boot;1981;8.4;0.0
+70;Taxi Driver;1976;8.4;0.0
+71;A Clockwork Orange;1971;8.4;0.0
+72;Double Indemnity;1944;8.4;0.0
+73;Oldboy;2003;8.4;0.0
+74;To Kill a Mockingbird;1962;8.4;0.0
+75;Requiem for a Dream;2000;8.4;0.0
+76;Reservoir Dogs;1992;8.4;0.0
+77;Princess Mononoke;1997;8.4;0.0
+78;Dawno temu w Ameryce;1984;8.4;0.0
+79;Lawrence of Arabia;1962;8.4;0.0
+80;Star Wars: Episode VI - Return of the Jedi;1983;8.4;0.0
+81;Braveheart;1995;8.4;0.0
+82;Eternal Sunshine of the Spotless Mind;2004;8.4;0.0
+83;Grave of the Fireflies;1988;8.4;0.0
+84;12 Years a Slave;2013;8.3;0.0
+85;Singin' in the Rain;1952;8.3;0.0
+86;Witness for the Prosecution;1957;8.3;0.0
+87;Bicycle Thieves;1948;8.3;0.0
+88;Full Metal Jacket;1987;8.3;0.0
+89;The Sting;1973;8.3;0.0
+90;All About Eve;1950;8.3;0.0
+91;Monty Python and the Holy Grail;1975;8.3;0.0
+92;Amadeus;1984;8.3;0.0
+93;Rashomon;1950;8.3;0.0
+94;The Treasure of the Sierra Madre;1948;8.3;0.0
+95;Some Like It Hot;1959;8.3;0.0
+96;The Third Man;1949;8.3;0.0
+97;Snatch;2000;8.3;0.0
+98;The Apartment;1960;8.3;0.0
+99;L.A Confidential;1997;8.3;0.0

@@ -53,8 +53,8 @@ void f_update(char* what)
 {
     if (strcmp (what, "pos") == 0)
     {
-        mvwprintw(interactif_win, nextPos.row, nextPos.column, "X");
         mvwprintw(interactif_win, charPos.row, charPos.column, "%c", board[charPos.row][charPos.column]);
+        mvwprintw(interactif_win, nextPos.row, nextPos.column, "X");
     }
     wrefresh(interactif_win);
 }
@@ -79,7 +79,6 @@ int getMove(int input)
             nextPos.row++;
             break;
         default:
-            DC(input);
             break;
         }
     }
@@ -249,7 +248,7 @@ void interpretBoard()
 
 /*Here will be defined what will perform 'digit' areas. Need to be manually
  *specified after creating the map*/
-void performAction(int digit)
+int performAction(int digit)
 {
     if (strcmp(mapName, "menu") == 0)
     {
@@ -269,12 +268,24 @@ void performAction(int digit)
         else
             assert(!TRUE);
     }
-    else if (strcmp(mapName, "sort") == 0)
+    else if (strcmp(mapName, "database") == 0)
     {
         if (digit == 1)
         {
-
+            teleport(2);
+            scrollData(UP);
         }
+        else if (digit == 2)
+        {
+            return TRUE;
+        }
+        else if (digit == 3)
+        {
+            teleport(2);
+            scrollData(DOWN);
+        }
+        else
+            assert(!TRUE);
     }
     else
     {
@@ -282,6 +293,7 @@ void performAction(int digit)
         SC(mapName);
         assert(!TRUE);
     }
+    return FALSE;
 }
 /*End of performAction*/
 
@@ -297,12 +309,12 @@ void switchMap(char* whatMap)
 int teleport(int searchFor)
 {
     int x, y;
-    /*First I need to find where is the second digit*/
+    /*Search for chosen digit*/
     for (y = 0; y <= HEIGHT_INT - 1; y++)
     {
         for (x = 0; x <= WIDTH_WIN - 1; x++)
         {
-            /*If found the nextPos teleport entrance*/
+            /*In case if used two same digits, skip the entrance*/
             if (y == nextPos.row && x == nextPos.column)
             {
                 continue;
@@ -340,7 +352,8 @@ int checkAction(int digit)
     /*Action attribute, so need to call performAction*/
     case 2:
         /*Pass what number is on the next position*/
-        performAction(board[nextPos.row][nextPos.column] - 48);
+        if (performAction(board[nextPos.row][nextPos.column] - 48) == TRUE)
+            return TRUE;
         break;
     }
     return 2;
