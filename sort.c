@@ -8,13 +8,14 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "header.h"
 
 WINDOW *sort_win;
 database_t current_database;
 database_t movies_database;
 database_t filtered_database;
-int firstVisRow, maxVisRow;
+int firstVisRow, lastRow;
 
 /*Initialize the sort window*/
 void initializeSort()
@@ -128,7 +129,7 @@ void loadDatabase(database_t *whatDatabase)
 void activateDatabase(database_t whatDatabase)
 {
     int i;
-    maxVisRow = 0, firstVisRow = 0;
+    lastRow = 0, firstVisRow = 0;
 
     for (i = 0; i <= DATABSIZE-1; i++)
     {
@@ -144,13 +145,10 @@ void activateDatabase(database_t whatDatabase)
         strcpy (current_database.column5_title, whatDatabase.column5_title);
 
         if (whatDatabase.column1[i] != 0)
-            maxVisRow++;
+            lastRow++;
     }
     /*Manage how far can scroll go (if is less than 10 lines, it should not be able to scroll*/
-    if (maxVisRow <= 10)
-        maxVisRow = 0;
-    else
-        maxVisRow -= 10;
+    /*Is also helpful in other stuff*/
 }
 /*End of activateDatabase*/
 
@@ -322,7 +320,7 @@ void scrollData(int direction)
     else if (direction == DOWN)
     {
         /*Check if is not scrolled all the way down already*/
-        if (firstVisRow < maxVisRow)
+        if (firstVisRow < lastRow - 10)
         {
             firstVisRow++;
             /*Print in all rows in window*/
@@ -342,18 +340,191 @@ void scrollData(int direction)
 }
 /*End of scrollData*/
 
-/*This function will sort the data focusing on chosen column*/
+/*Not very universal function but in the sake of code clarity*/
+void copyData(int i)
+{
+    int tempInt;
+    float tempFloat;
+    char tempChar[80];
+
+    tempInt = current_database.column1[i];
+    current_database.column1[i] = current_database.column1[i-1];
+    current_database.column1[i-1] = tempInt;
+
+    strcpy (tempChar, current_database.column2[i]);
+    strcpy (current_database.column2[i], current_database.column2[i-1]);
+    strcpy (current_database.column2[i-1], tempChar);
+
+    tempInt = current_database.column3[i];
+    current_database.column3[i] = current_database.column3[i-1];
+    current_database.column3[i-1] = tempInt;
+
+    tempFloat = current_database.column4[i];
+    current_database.column4[i] = current_database.column4[i-1];
+    current_database.column4[i-1] = tempFloat;
+
+    tempFloat = current_database.column5[i];
+    current_database.column5[i] = current_database.column5[i-1];
+    current_database.column5[i-1] = tempFloat;
+}
+/*End of copyData*/
+
+/*This function will sort the chosen database using Bubble Sort focusing on chosen column*/
 void sortData(int whichCol, int order)
 {
+    int j, i, letter;
+
     /*Increasing*/
     if (order == UP)
     {
-
+        if (whichCol == 1)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column1[i] < current_database.column1[i-1])
+                        copyData(i);
+                }
+            }
+        }
+        else if (whichCol == 2)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    for (letter = 0; letter <= 79; letter++)
+                    {
+                        if (tolower (current_database.column2[i][letter]) < tolower (current_database.column2[i-1][letter]))
+                        {
+                            copyData(i);
+                            break;
+                        }
+                        /*If letters are in correct order*/
+                        else if (tolower (current_database.column2[i][letter]) > tolower (current_database.column2[i-1][letter]))
+                            break;
+                        /*If letters are equal, keep looping as long as not found higher or lower letter*/
+                    }
+                }
+            }
+        }
+        else if (whichCol == 3)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column3[i] < current_database.column3[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
+        else if (whichCol == 4)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column4[i] < current_database.column4[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
+        else if (whichCol == 5)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column5[i] < current_database.column5[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
     }
     /*Decreasing*/
     else if (order == DOWN)
     {
-
+        if (whichCol == 1)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column1[i] > current_database.column1[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
+        else if (whichCol == 2)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    for (letter = 0; letter <= 79; letter++)
+                    {
+                        if (tolower (current_database.column2[i][letter]) > tolower (current_database.column2[i-1][letter]))
+                        {
+                            copyData(i);
+                            break;
+                        }
+                        /*If letters are in correct order*/
+                        else if (tolower (current_database.column2[i][letter]) < tolower (current_database.column2[i-1][letter]))
+                            break;
+                        /*If letters are equal, keep looping as long as not found higher or lower letter*/
+                    }
+                }
+            }
+        }
+        else if (whichCol == 3)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column3[i] > current_database.column3[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
+        else if (whichCol == 4)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column4[i] > current_database.column4[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
+        else if (whichCol == 5)
+        {
+            for (j = 1; j <= lastRow; j++)
+            {
+                for (i = 1; i <= lastRow-j; i++)
+                {
+                    if (current_database.column5[i] > current_database.column5[i-1])
+                    {
+                        copyData(i);
+                    }
+                }
+            }
+        }
     }
     else
         assert(!TRUE);

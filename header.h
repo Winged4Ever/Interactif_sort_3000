@@ -67,6 +67,8 @@ void f_printData(int, int, int, char*);
 void scrollData(int);
 void activateDatabase(database_t);
 int f_filterData(int, char*, int, char*);
+void sortData(int, int);
+void copyData(int);
 
 #define draw(a)                 f_draw(#a)
 #define update(a)               f_update(#a)
@@ -88,7 +90,7 @@ extern WINDOW *sort_win;
 extern database_t movies_database;
 extern database_t current_database;
 extern database_t filtered_database;
-extern int firstVisRow, maxVisRow;
+extern int firstVisRow, lastRow;
 
 /*Check what's inside numerical (D), string (S) variable and e.t.c.*/
 #define DC(Var)     (mvprintw(23, 4, "vCheck: " #Var " = %d", Var));getch();clearLine(stdscr, 23);wrefresh(stdscr);

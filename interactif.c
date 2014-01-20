@@ -299,6 +299,12 @@ int performAction(int digit)
             initializeData();
             return TRUE;
         }
+        else if (digit == 6)
+        {
+            sortData(2, DOWN);
+            initializeData();
+            return TRUE;
+        }
         else
             assert(!TRUE);
     }
