@@ -17,6 +17,26 @@
 #define DOWN        2
 #define DATABSIZE   99
 
+typedef struct
+{
+    char column1_title[20];
+    int column1[DATABSIZE];
+    char column2_title[20];
+    char column2[DATABSIZE][80];
+    char column3_title[20];
+    int column3[DATABSIZE];
+    char column4_title[20];
+    float column4[DATABSIZE];
+    char column5_title[20];
+    float column5[DATABSIZE];
+} database_t;
+
+typedef struct
+{
+    int row;
+    int column;
+} point;
+
 void f_draw(char*);
 int stringLength(char*);
 void closeProg();
@@ -41,39 +61,22 @@ void reprintLine(WINDOW*, int);
 void bgchange(WINDOW*, int, int, int);
 void update(char*);
 void printFrom(WINDOW*, int, int, char*);
-void loadDatabase();
+void loadDatabase(database_t *);
 void initializeData();
 void f_printData(int, int, int, char*);
 void scrollData(int);
+void activateDatabase(database_t);
+int f_filterData(int, char*, int, char*);
 
 #define draw(a)                 f_draw(#a)
 #define update(a)               f_update(#a)
 #define printData(a,b,c,d)      f_printData(a,b,c,#d)
+#define filterData(a,b,c,d)     f_filterData(a,#b,c,#d)
 
 #define XMIN                    getbegx(whatWindow)
 #define XMAX                    getmaxx(whatWindow)
 #define YMIN                    getbegy(whatWindow)
 #define YMAX                    getmaxy(whatWindow)
-
-typedef struct
-{
-    int row;
-    int column;
-} point;
-
-typedef struct
-{
-    char column1_title[20];
-    int column1[DATABSIZE];
-    char column2_title[20];
-    char column2[DATABSIZE][80];
-    char column3_title[20];
-    int column3[DATABSIZE];
-    char column4_title[20];
-    float column4[DATABSIZE];
-    char column5_title[20];
-    float column5[DATABSIZE];
-} database_t;
 
 extern char board[HEIGHT_INT][WIDTH_WIN+1];
 extern char mapName[20];
@@ -83,7 +86,9 @@ extern point nextPos;
 extern WINDOW *interactif_win;
 extern WINDOW *sort_win;
 extern database_t movies_database;
-extern int firstVisRow;
+extern database_t current_database;
+extern database_t filtered_database;
+extern int firstVisRow, maxVisRow;
 
 /*Check what's inside numerical (D), string (S) variable and e.t.c.*/
 #define DC(Var)     (mvprintw(23, 4, "vCheck: " #Var " = %d", Var));getch();clearLine(stdscr, 23);wrefresh(stdscr);

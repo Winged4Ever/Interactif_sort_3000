@@ -284,6 +284,21 @@ int performAction(int digit)
             teleport(2);
             scrollData(DOWN);
         }
+        else if (digit == 4)
+        {
+            if (filterData(3, 2002, 4, 8.7) == TRUE)
+            {
+                activateDatabase(filtered_database);
+                initializeData();
+            }
+            return TRUE;
+        }
+        else if (digit == 5)
+        {
+            activateDatabase(movies_database);
+            initializeData();
+            return TRUE;
+        }
         else
             assert(!TRUE);
     }
