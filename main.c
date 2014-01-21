@@ -1,6 +1,6 @@
 /*
  * File:   main.c
- * Author: Tomasz Liszkowski
+ * Author: Tomasz 'Winged' Liszkowski
  */
 
 #include <curses.h>
@@ -127,7 +127,7 @@ void f_draw(char* whatToDraw)
         {
             for (x = 0; x <= WIDTH_WIN; x++)
             {
-                mvwprintw (interactif_win, y, x, "%c", board[y][x]);
+                mvwprintw (interactif_win, y, x, "%c", visibleMap[y][x]);
             }
             /*Draw beginning character position*/
             mvwprintw(interactif_win, charPos.row, charPos.column, "X");
@@ -502,6 +502,7 @@ void closeProg()
 {
     wipeAnimation(stdscr, DOWN);
     printCenter(stdscr, HEIGHT/2, "Thanks for playing! Have a nice day!", 1);
+    flushinp();
     getch();
     exit (0);
 }

@@ -1,6 +1,6 @@
 /*
  * File:   header.h
- * Author: Tomasz Liszkowski
+ * Author: Tomasz 'Winged' Liszkowski
  */
 
 #ifndef MYHEAD_H_
@@ -15,6 +15,8 @@
 #define DRAWSPEED   20
 #define UP          1
 #define DOWN        2
+#define LEFT        1
+#define RIGHT       2
 #define DATABSIZE   99
 
 typedef struct
@@ -45,7 +47,7 @@ void updateInteractif();
 int getMove(int);
 void loadMap(char*);
 void interpretBoard();
-int performAction(int);
+int pAAction(int);
 void switchMap(char*);
 int teleport(int);
 int checkAction(int);
@@ -69,6 +71,13 @@ void activateDatabase(database_t);
 int f_filterData(int, char*, int, char*);
 void sortData(int, int);
 void copyData(int);
+void cAAppearance(int, int);
+int cMAttribute(int, int, int, int);
+int cMAppearance(int, int, int, char);
+int useDoor(int, int);
+int returnAttribute(int);
+char returnVisible(int);
+int pMAction(int);
 
 #define draw(a)                 f_draw(#a)
 #define update(a)               f_update(#a)
@@ -80,6 +89,7 @@ void copyData(int);
 #define YMIN                    getbegy(whatWindow)
 #define YMAX                    getmaxy(whatWindow)
 
+extern char visibleMap[HEIGHT_INT][WIDTH_WIN+1];
 extern char board[HEIGHT_INT][WIDTH_WIN+1];
 extern char mapName[20];
 extern int attributeMap[HEIGHT_INT][WIDTH_WIN];
@@ -117,5 +127,15 @@ extern int firstVisRow, lastRow;
 #define CROSS       197
 #define VER         179
 #define HOR         196
+
+/*Define uppercase letters for broader action scripting*/
+#define A           17
+#define B           18
+#define C           19
+#define D           20
+#define E           21
+#define F           22
+#define G           23
+#define H           24
 
 #endif

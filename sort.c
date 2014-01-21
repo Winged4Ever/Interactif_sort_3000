@@ -1,6 +1,6 @@
 /*
  * File:   sort.c
- * Author: Tomasz Liszkowski
+ * Author: Tomasz 'Winged' Liszkowski
  */
 
 #include <curses.h>
@@ -176,8 +176,9 @@ void initializeData()
             printData(column, row-2, row, data);
             printData(column, row-2, row, data);
         }
+        wrefresh(sort_win);
+        Sleep (DRAWSPEED);
     }
-    wrefresh(sort_win);
 }
 /*End of initializeData*/
 

@@ -1,6 +1,6 @@
 /*
  * File:   interactif.c
- * Author: Tomasz Liszkowski
+ * Author: Tomasz 'Winged' Liszkowski
  */
 
 #include <curses.h>
@@ -14,6 +14,7 @@ point charPos;
 WINDOW *interactif_win;
 char board[HEIGHT_INT][WIDTH_WIN+1];
 int attributeMap[HEIGHT_INT][WIDTH_WIN];
+char visibleMap[HEIGHT_INT][WIDTH_WIN+1];
 char mapName[20];
 
 /*Main function of interactif window*/
@@ -35,13 +36,21 @@ void runInteractif()
     printFrom(stdscr, HEIGHT-1, 5, "ARROW KEYS");
     wattroff(stdscr, COLOR_PAIR(4));
     wattron(stdscr, COLOR_PAIR(1));
-    printFrom(stdscr, HEIGHT-1, 16, "to move your character.");
+    printFrom(stdscr, HEIGHT-1, 16, "to move your character. Use");
+    wattroff(stdscr, COLOR_PAIR(1));
+    wattron(stdscr, COLOR_PAIR(4));
+    printFrom(stdscr, HEIGHT-1, 44, "ENTER");
+    wattroff(stdscr, COLOR_PAIR(4));
+    wattron(stdscr, COLOR_PAIR(1));
+    printFrom(stdscr, HEIGHT-1, 50, "to open the doors ^^");
     wattroff(stdscr, COLOR_PAIR(1));
 
+    flushinp();
     int input;
     while (1 == 1)
     {
         /*Receive input*/
+        flushinp();
         input = getch();
         getMove(input);
     }
@@ -53,7 +62,7 @@ void f_update(char* what)
 {
     if (strcmp (what, "pos") == 0)
     {
-        mvwprintw(interactif_win, charPos.row, charPos.column, "%c", board[charPos.row][charPos.column]);
+        mvwprintw(interactif_win, charPos.row, charPos.column, "%c", visibleMap[charPos.row][charPos.column]);
         mvwprintw(interactif_win, nextPos.row, nextPos.column, "X");
     }
     wrefresh(interactif_win);
@@ -136,6 +145,10 @@ int getMove(int input)
             break;
         }
     }
+    else if (input == 13)
+    {
+        pMAction(board[charPos.row][charPos.column] - 48);
+    }
     return 0;
 }
 /*End of getMove*/
@@ -174,7 +187,10 @@ void loadMap(char* whatMap)
             fgets (tempArray, WIDTH_WIN + 2, pFile);
             for (column = 0; column <= 80; column++)
             {
+                /*'board' will be untouched, in order to reference to the original map in some procedures*/
                 board[row][column] = tempArray[column];
+                /*'visibleMap' may be overwritten, modified, and all*/
+                visibleMap[row][column] = tempArray[column];
             }
             row++;
         }
@@ -214,14 +230,15 @@ void interpretBoard()
             {
                 attributeMap[y][x] = 1;
             }
-            /*If is digit (from ASCII table)*/
-            else if (board[y][x] >= 48 && board[y][x] <= 57)
+            /*If is digit or upper-case letter(from ASCII table)*/
+            else if ((board[y][x] >= 65 && board[y][x] <= 90) || (board[y][x] >= 48 && board[y][x] <= 57))
             {
-                /*Attribute 2 will redirect to performAction function*/
+                cAAppearance(y, x);
+                /*Attribute 2 will redirect to pAAction function*/
                 attributeMap[y][x] = 2;
             }
-            /*If is letter (from ASCII table)*/
-            else if ((board[y][x] >= 65 && board[y][x] <= 90) || (board[y][x] >= 97 && board[y][x] <= 122))
+            /*If is low-case letter (from ASCII table)*/
+            else if ((board[y][x] >= 97 && board[y][x] <= 122))
             {
                 attributeMap[y][x] = 0;
             }
@@ -239,84 +256,12 @@ void interpretBoard()
             }
             else
             {
-                attributeMap[y][x] = 1;
+                attributeMap[y][x] = 0;
             }
         }
     }
 }
 /*End of interpretBoard*/
-
-/*Here will be defined what will perform 'digit' areas. Need to be manually
- *specified after creating the map*/
-int performAction(int digit)
-{
-    if (strcmp(mapName, "menu") == 0)
-    {
-        if (digit == 1)
-        {
-            initializeSort();
-            switchMap("database");
-        }
-        else if (digit == 2)
-        {
-            teleport(digit);
-        }
-        else if (digit == 3)
-        {
-            closeProg();
-        }
-        else
-            assert(!TRUE);
-    }
-    else if (strcmp(mapName, "database") == 0)
-    {
-        if (digit == 1)
-        {
-            teleport(2);
-            scrollData(UP);
-        }
-        else if (digit == 2)
-        {
-            return TRUE;
-        }
-        else if (digit == 3)
-        {
-            teleport(2);
-            scrollData(DOWN);
-        }
-        else if (digit == 4)
-        {
-            if (filterData(3, 2002, 4, 8.7) == TRUE)
-            {
-                activateDatabase(filtered_database);
-                initializeData();
-            }
-            return TRUE;
-        }
-        else if (digit == 5)
-        {
-            activateDatabase(movies_database);
-            initializeData();
-            return TRUE;
-        }
-        else if (digit == 6)
-        {
-            sortData(2, DOWN);
-            initializeData();
-            return TRUE;
-        }
-        else
-            assert(!TRUE);
-    }
-    else
-    {
-        perror ("'mapName' out of speck");
-        SC(mapName);
-        assert(!TRUE);
-    }
-    return FALSE;
-}
-/*End of performAction*/
 
 /*Will call some functions and clear clear some things*/
 void switchMap(char* whatMap)
@@ -335,7 +280,7 @@ int teleport(int searchFor)
     {
         for (x = 0; x <= WIDTH_WIN - 1; x++)
         {
-            /*In case if used two same digits, skip the entrance*/
+            /*In case if used two same digits, skip the entrance position*/
             if (y == nextPos.row && x == nextPos.column)
             {
                 continue;
@@ -370,13 +315,172 @@ int checkAction(int digit)
     case 1:
         return FALSE;
         break;
-    /*Action attribute, so need to call performAction*/
+    /*Action attribute, so need to call pAAction*/
     case 2:
         /*Pass what number is on the next position*/
-        if (performAction(board[nextPos.row][nextPos.column] - 48) == TRUE)
+        switch (pAAction(board[nextPos.row][nextPos.column] - 48))
+        {
+        case TRUE:
             return TRUE;
+        case FALSE:
+            return FALSE;
+        default:
+            break;
+        }
         break;
     }
     return 2;
 }
 /*End of checkAction*/
+
+/*Change the attribute of chosen area*/
+int cMAttribute(int searchFor, int dY, int dX, int attribute)
+{
+    int x, y;
+    /*Search for chosen aChar*/
+    for (y = 0; y <= HEIGHT_INT - 1; y++)
+    {
+        for (x = 0; x <= WIDTH_WIN - 1; x++)
+        {
+            if (board[y][x] == searchFor + 48)
+            {
+                attributeMap[y+dY][x+dX] = attribute;
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+/*End of changeAttribute*/
+
+/*Change appearance using action scripting*/
+int cMAppearance(int searchFor, int dY, int dX, char character)
+{
+    int x, y;
+    /*Search for chosen aChar*/
+    for (y = 0; y <= HEIGHT_INT - 1; y++)
+    {
+        for (x = 0; x <= WIDTH_WIN - 1; x++)
+        {
+            if (board[y][x] == searchFor + 48)
+            {
+                if (charPos.row == y+dY && charPos.column == x+dX)
+                    return 0;
+                visibleMap[y+dY][x+dX] = character;
+                mvwprintw (interactif_win, y+dY, x+dX, "%c", visibleMap[y+dY][x+dX]);
+      //          mvwprintw(interactif_win, charPos.row, charPos.column, "X");
+                wrefresh(interactif_win);
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+/*End of changeAppearance*/
+
+/*This will return attribute of chosen aChar's area*/
+int returnAttribute(int searchFor)
+{
+    int x, y;
+    for (y = 0; y <= HEIGHT_INT - 1; y++)
+    {
+        for (x = 0; x <= WIDTH_WIN - 1; x++)
+        {
+            if (board[y][x] == searchFor + 48)
+            {
+                return attributeMap[y][x];
+            }
+        }
+    }
+    return 0;
+}
+/*End of returnAttribute*/
+
+/*It will return what is in the visibleMap over the aChar*/
+char returnVisible(int searchFor)
+{
+    int x, y;
+    for (y = 0; y <= HEIGHT_INT - 1; y++)
+    {
+        for (x = 0; x <= WIDTH_WIN - 1; x++)
+        {
+            if (board[y][x] == searchFor + 48)
+            {
+                return visibleMap[y][x];
+            }
+        }
+    }
+    return 0;
+}
+/*End of returnVisible*/
+
+/*Will open/close the doors*/
+int useDoor(int searchFor, int direction)
+{
+    /*If are CLOSED*/
+    if (returnAttribute(searchFor) != 0)
+    {
+        if (direction == UP)
+        {
+            cMAttribute(searchFor, 0, 0, 0);
+            cMAppearance(searchFor, 0, 0, ' ');
+            cMAppearance(searchFor, -1, 0, '/');
+            Sleep (DRAWSPEED);
+            cMAppearance(searchFor, -1, 0, ' ');
+            cMAppearance(searchFor, -1, -1, '|');
+            cMAttribute(searchFor, -1, -1, 1);
+        }
+        else if (direction == DOWN)
+        {
+
+        }
+        else if (direction == LEFT)
+        {
+            cMAttribute(searchFor, 0, 0, 0);
+            cMAppearance(searchFor, 0, 0, ' ');
+            cMAppearance(searchFor, 0, 1, '/');
+            Sleep (DRAWSPEED);
+            cMAppearance(searchFor, 0, 1, ' ');
+            cMAppearance(searchFor, 1, 1, '-');
+            cMAttribute(searchFor, 1, 1, 1);
+        }
+        else if (direction == RIGHT)
+        {
+
+        }
+    }
+    /*If are OPENED*/
+    else
+    {
+    if (direction == UP)
+        {
+            cMAttribute(searchFor, -1, -1, 0);
+            cMAppearance(searchFor, -1, -1, ' ');
+            cMAppearance(searchFor, -1, 0, '/');
+            Sleep (DRAWSPEED);
+            cMAttribute(searchFor, 0, 0, 1);
+            cMAppearance(searchFor, -1, 0, ' ');
+            cMAppearance(searchFor, 0, 0, '-');
+        }
+        else if (direction == DOWN)
+        {
+
+        }
+        else if (direction == LEFT)
+        {
+            cMAttribute(searchFor, 1, 1, 0);
+            cMAppearance(searchFor, 1, 1, ' ');
+            cMAppearance(searchFor, 0, 1, '/');
+            Sleep (DRAWSPEED);
+            cMAttribute(searchFor, 0, 0, 1);
+            cMAppearance(searchFor, 0, 1, ' ');
+            cMAppearance(searchFor, 0, 0, '|');
+        }
+        else if (direction == RIGHT)
+        {
+
+        }
+    }
+    return 0;
+}
+/*End of useDoor*/
