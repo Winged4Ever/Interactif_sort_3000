@@ -16,6 +16,8 @@ char board[HEIGHT_INT][WIDTH_WIN+1];
 int attributeMap[HEIGHT_INT][WIDTH_WIN];
 char visibleMap[HEIGHT_INT][WIDTH_WIN+1];
 char mapName[20];
+int action1, action2;
+char v_column1[70], v_column3[70], v_column2[70], v_column4[70], v_column5[70];
 
 /*Main function of interactif window*/
 void runInteractif()
@@ -42,7 +44,7 @@ void runInteractif()
     printFrom(stdscr, HEIGHT-1, 44, "ENTER");
     wattroff(stdscr, COLOR_PAIR(4));
     wattron(stdscr, COLOR_PAIR(1));
-    printFrom(stdscr, HEIGHT-1, 50, "to open the doors ^^");
+    printFrom(stdscr, HEIGHT-1, 50, "to 'use' objects");
     wattroff(stdscr, COLOR_PAIR(1));
 
     flushinp();
@@ -145,7 +147,7 @@ int getMove(int input)
             break;
         }
     }
-    else if (input == 13)
+    else if (input == ENTER)
     {
         pMAction(board[charPos.row][charPos.column] - 48);
     }
@@ -198,6 +200,7 @@ void loadMap(char* whatMap)
 	/*When reached end of file and not found anything*/
 	fclose (pFile);
 
+    loadGlobalActions(whatMap);
     interpretBoard();
     draw(board);
 }
@@ -230,14 +233,13 @@ void interpretBoard()
             {
                 attributeMap[y][x] = 1;
             }
-            /*If is digit or upper-case letter(from ASCII table)*/
-            else if ((board[y][x] >= 65 && board[y][x] <= 90) || (board[y][x] >= 48 && board[y][x] <= 57))
+            /*If is DIGIT or UPPERCASE letter (from ASCII table)*/
+            else if ((board[y][x] >= 48 && board[y][x] <= 57) || (board[y][x] >= 65 && board[y][x] <= 90))
             {
                 cAAppearance(y, x);
-                /*Attribute 2 will redirect to pAAction function*/
-                attributeMap[y][x] = 2;
+                cAAttribute(y, x);
             }
-            /*If is low-case letter (from ASCII table)*/
+            /*If is LOWERCASE letter (from ASCII table)*/
             else if ((board[y][x] >= 97 && board[y][x] <= 122))
             {
                 attributeMap[y][x] = 0;
@@ -310,26 +312,21 @@ int checkAction(int digit)
     /*Floor attribute, always possible to move, so always TRUE*/
     case 0:
         return TRUE;
-        break;
     /*Wall attribute, never possible to move, so always FALSE*/
     case 1:
         return FALSE;
-        break;
-    /*Action attribute, so need to call pAAction*/
+    /*Just run some action*/
     case 2:
         /*Pass what number is on the next position*/
-        switch (pAAction(board[nextPos.row][nextPos.column] - 48))
-        {
-        case TRUE:
-            return TRUE;
-        case FALSE:
-            return FALSE;
-        default:
-            break;
-        }
+        pAAction(board[nextPos.row][nextPos.column] - 48);
         break;
+    /*Allow to walk on that area + run some action*/
+    case 3:
+        /*Pass what number is on the next position*/
+        pAAction(board[nextPos.row][nextPos.column] - 48);
+        return TRUE;
     }
-    return 2;
+    return -1;
 }
 /*End of checkAction*/
 
@@ -344,7 +341,7 @@ int cMAttribute(int searchFor, int dY, int dX, int attribute)
         {
             if (board[y][x] == searchFor + 48)
             {
-                attributeMap[y+dY][x+dX] = attribute;
+                attributeMap[y-dY][x+dX] = attribute;
                 return 0;
             }
         }
@@ -364,17 +361,18 @@ int cMAppearance(int searchFor, int dY, int dX, char character)
         {
             if (board[y][x] == searchFor + 48)
             {
-                if (charPos.row == y+dY && charPos.column == x+dX)
+                visibleMap[y-dY][x+dX] = character;
+                /*If our character is standing on that point, don't refresh it now*/
+                if (charPos.row == y-dY && charPos.column == x+dX)
                     return 0;
-                visibleMap[y+dY][x+dX] = character;
-                mvwprintw (interactif_win, y+dY, x+dX, "%c", visibleMap[y+dY][x+dX]);
-      //          mvwprintw(interactif_win, charPos.row, charPos.column, "X");
+
+                mvwprintw (interactif_win, y-dY, x+dX, "%c", visibleMap[y-dY][x+dX]);
                 wrefresh(interactif_win);
                 return 0;
             }
         }
     }
-    return 0;
+    return -1;
 }
 /*End of changeAppearance*/
 
@@ -414,73 +412,219 @@ char returnVisible(int searchFor)
 }
 /*End of returnVisible*/
 
+/*Return one of the coords (only one cause it will be later helpful in dividing map)*/
+/*Defined as returnACharPos !*/
+int f_returnACharPos(int searchFor, char xOrY)
+{
+    int x, y;
+    for (y = 0; y <= HEIGHT_INT - 1; y++)
+    {
+        for (x = 0; x <= WIDTH_WIN - 1; x++)
+        {
+            if (board[y][x] == searchFor + 48)
+            {
+                if (xOrY == 'y')
+                    return y;
+                else if (xOrY == 'x')
+                    return x;
+                else
+                    perror ("'xOrY' out of speck");
+                    SC(xOrY);
+                    assert(!TRUE);
+            }
+        }
+    }
+    /*If not found, return -1*/
+    return -1;
+}
+/*End of f_returnACharPos*/
+
 /*Will open/close the doors*/
 int useDoor(int searchFor, int direction)
 {
-    /*If are CLOSED*/
+    if (openDoor(searchFor, direction) == FALSE)
+        closeDoor(searchFor, direction);
+    return 0;
+}
+/*End of useDoor*/
+
+/*Will only open the door*/
+int openDoor(int searchFor, int direction)
+{
     if (returnAttribute(searchFor) != 0)
     {
         if (direction == UP)
         {
             cMAttribute(searchFor, 0, 0, 0);
             cMAppearance(searchFor, 0, 0, ' ');
-            cMAppearance(searchFor, -1, 0, '/');
-            Sleep (DRAWSPEED);
-            cMAppearance(searchFor, -1, 0, ' ');
-            cMAppearance(searchFor, -1, -1, '|');
-            cMAttribute(searchFor, -1, -1, 1);
+            cMAppearance(searchFor, 1, 0, '/');
+            Sleep (DRAWSPEED*2);
+            cMAppearance(searchFor, 1, 0, ' ');
+            cMAppearance(searchFor, 1, -1, '|');
+            cMAttribute(searchFor, 1, -1, 1);
         }
         else if (direction == DOWN)
         {
-
+            cMAttribute(searchFor, 0, 0, 0);
+            cMAppearance(searchFor, 0, 0, ' ');
+            cMAppearance(searchFor, -1, 0, '/');
+            Sleep (DRAWSPEED*2);
+            cMAppearance(searchFor, -1, 0, ' ');
+            cMAppearance(searchFor, -1, 1, '|');
+            cMAttribute(searchFor, -1, 1, 1);
         }
         else if (direction == LEFT)
         {
             cMAttribute(searchFor, 0, 0, 0);
             cMAppearance(searchFor, 0, 0, ' ');
-            cMAppearance(searchFor, 0, 1, '/');
-            Sleep (DRAWSPEED);
+            cMAppearance(searchFor, 0, -1, 92);
+            Sleep (DRAWSPEED*2);
+            cMAppearance(searchFor, 0, -1, ' ');
+            cMAppearance(searchFor, -1, -1, '-');
+            cMAttribute(searchFor, -1, -1, 1);
+        }
+        else if (direction == RIGHT)
+        {
+            cMAttribute(searchFor, 0, 0, 0);
+            cMAppearance(searchFor, 0, 0, ' ');
+            cMAppearance(searchFor, 0, 1, 92);
+            Sleep (DRAWSPEED*2);
             cMAppearance(searchFor, 0, 1, ' ');
             cMAppearance(searchFor, 1, 1, '-');
             cMAttribute(searchFor, 1, 1, 1);
         }
-        else if (direction == RIGHT)
-        {
-
-        }
+        return TRUE;
     }
-    /*If are OPENED*/
-    else
+    return FALSE;
+}
+/*End of openDoor*/
+
+/*Will only close the door*/
+int closeDoor(int searchFor, int direction)
+{
+    if (returnAttribute(searchFor) == 0)
     {
-    if (direction == UP)
+        if (direction == UP)
         {
-            cMAttribute(searchFor, -1, -1, 0);
-            cMAppearance(searchFor, -1, -1, ' ');
-            cMAppearance(searchFor, -1, 0, '/');
-            Sleep (DRAWSPEED);
+            cMAttribute(searchFor, 1, -1, 0);
+            cMAppearance(searchFor, 1, -1, ' ');
+            cMAppearance(searchFor, 1, 0, '/');
+            Sleep (DRAWSPEED*2);
             cMAttribute(searchFor, 0, 0, 1);
-            cMAppearance(searchFor, -1, 0, ' ');
+            cMAppearance(searchFor, 1, 0, ' ');
             cMAppearance(searchFor, 0, 0, '-');
         }
         else if (direction == DOWN)
         {
-
+            cMAttribute(searchFor, -1, 1, 0);
+            cMAppearance(searchFor, -1, 1, ' ');
+            cMAppearance(searchFor, -1, 0, '/');
+            Sleep (DRAWSPEED*2);
+            cMAttribute(searchFor, 0, 0, 1);
+            cMAppearance(searchFor, -1, 0, ' ');
+            cMAppearance(searchFor, 0, 0, '-');
         }
         else if (direction == LEFT)
         {
-            cMAttribute(searchFor, 1, 1, 0);
-            cMAppearance(searchFor, 1, 1, ' ');
-            cMAppearance(searchFor, 0, 1, '/');
-            Sleep (DRAWSPEED);
+            cMAttribute(searchFor, -1, -1, 0);
+            cMAppearance(searchFor, -1, -1, ' ');
+            cMAppearance(searchFor, 0, -1, 92);
+            Sleep (DRAWSPEED*2);
             cMAttribute(searchFor, 0, 0, 1);
-            cMAppearance(searchFor, 0, 1, ' ');
+            cMAppearance(searchFor, 0, -1, ' ');
             cMAppearance(searchFor, 0, 0, '|');
         }
         else if (direction == RIGHT)
         {
+            cMAttribute(searchFor, 1, 1, 0);
+            cMAppearance(searchFor, 1, 1, ' ');
+            cMAppearance(searchFor, 0, 1, 92);
+            Sleep (DRAWSPEED*2);
+            cMAttribute(searchFor, 0, 0, 1);
+            cMAppearance(searchFor, 0, 1, ' ');
+            cMAppearance(searchFor, 0, 0, '|');
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+/*End of closeDoor*/
 
+/*Will create new window, providing an elegant way of passing input*/
+/*Defined as passValue !*/
+void f_passValue(char* whatColumn, int* returnSuccess)
+{
+    WINDOW *pass_win;
+    pass_win = newwin(HEIGHT_INT, WIDTH_WIN, 1, 1);
+    bgchange(pass_win, COLOR_WHITE, COLOR_CYAN, 97);
+    wattron(pass_win, COLOR_PAIR(97));
+    char value[70];
+
+    if (strcmp (whatColumn, "column1") == 0)
+    {
+        printCenter (pass_win, 4, "Enter the value for column 1", 1);
+        if (writeCenter(pass_win, 6, value) == TRUE)
+        {
+            strcpy (v_column1, value);
+            *returnSuccess = 1;
         }
     }
-    return 0;
+    else if (strcmp (whatColumn, "column2") == 0)
+    {
+        printCenter(pass_win, 4, "Enter the value for column 2", 1);
+        if (writeCenter(pass_win, 6, value) == TRUE)
+        {
+            strcpy (v_column2, value);
+            *returnSuccess = 2;
+        }
+    }
+    else if (strcmp (whatColumn, "column3") == 0)
+    {
+        printCenter(pass_win, 4, "Enter the value for column 3", 1);
+        if (writeCenter(pass_win, 6, value) == TRUE)
+        {
+            strcpy (v_column3, value);
+            *returnSuccess = 3;
+        }
+    }
+    else if (strcmp (whatColumn, "column4") == 0)
+    {
+        printCenter(pass_win, 4, "Enter the value for column 4", 1);
+        if (writeCenter(pass_win, 6, value) == TRUE)
+        {
+            strcpy (v_column4, value);
+            *returnSuccess = 4;
+        }
+    }
+    else if (strcmp (whatColumn, "column5") == 0)
+    {
+        printCenter(pass_win, 4, "Enter the value for column 5", 1);
+        if (writeCenter(pass_win, 6, value) == TRUE)
+        {
+            strcpy (v_column5, value);
+            *returnSuccess = 5;
+        }
+    }
+    else
+        assert (!TRUE);
+    /*Revert to previous window*/
+    silenceOn();
+    wattroff(pass_win, COLOR_PAIR(97));
+    bgchange(pass_win, COLOR_CYAN, COLOR_WHITE, 96);
+    delwin(pass_win);
+    interactif_win = newwin(HEIGHT_INT, WIDTH_WIN, 1, 1);
+    wattron(interactif_win, COLOR_PAIR(1));
+    draw(board);
 }
-/*End of useDoor*/
+/*End of f_passValue*/
+
+/*Reset some kind of quest conditions*/
+void loadGlobalActions(char* whatMap)
+{
+    if (strcmp (whatMap, "filtering") == 0)
+    {
+        action1 = FALSE;
+        action2 = FALSE;
+    }
+}
+/*End of loadGlobalActions*/

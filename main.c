@@ -129,9 +129,9 @@ void f_draw(char* whatToDraw)
             {
                 mvwprintw (interactif_win, y, x, "%c", visibleMap[y][x]);
             }
-            /*Draw beginning character position*/
-            mvwprintw(interactif_win, charPos.row, charPos.column, "X");
         }
+        /*Draw beginning character position*/
+        mvwprintw(interactif_win, charPos.row, charPos.column, "X");
         wrefresh(interactif_win);
     }
     else if (strcmp (whatToDraw, "table") == 0)
@@ -144,9 +144,9 @@ void f_draw(char* whatToDraw)
         for (y = 0; y <= 1; y++)
         {
             mvwprintw (whatWindow, y, 4, "%c", VER) ;
-            mvwprintw (whatWindow, y, 48, "%c", VER);
-            mvwprintw (whatWindow, y, 55, "%c", VER);
-            mvwprintw (whatWindow, y, 64, "%c", VER);
+            mvwprintw (whatWindow, y, 45, "%c", VER);
+            mvwprintw (whatWindow, y, 52, "%c", VER);
+            mvwprintw (whatWindow, y, 61, "%c", VER);
             wrefresh(whatWindow);
             Sleep (DRAWSPEED);
         }
@@ -157,9 +157,9 @@ void f_draw(char* whatToDraw)
             mvwprintw (whatWindow, 1 ,x ,"%c", HOR);
         }
         mvwprintw (whatWindow, 1, 4, "%c", CROSS);
-        mvwprintw (whatWindow, 1, 48, "%c", CROSS);
-        mvwprintw (whatWindow, 1, 55, "%c", CROSS);
-        mvwprintw (whatWindow, 1, 64, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 45, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 52, "%c", CROSS);
+        mvwprintw (whatWindow, 1, 61, "%c", CROSS);
         wrefresh(whatWindow);
         Sleep (DRAWSPEED);
 
@@ -167,9 +167,9 @@ void f_draw(char* whatToDraw)
         for (y = 2; y < YMAX; y++)
         {
             mvwprintw (whatWindow, y, 4, "%c", VER);
-            mvwprintw (whatWindow, y, 48, "%c", VER);
-            mvwprintw (whatWindow, y, 55, "%c", VER);
-            mvwprintw (whatWindow, y, 64, "%c", VER);
+            mvwprintw (whatWindow, y, 45, "%c", VER);
+            mvwprintw (whatWindow, y, 52, "%c", VER);
+            mvwprintw (whatWindow, y, 61, "%c", VER);
             wrefresh(whatWindow);
             Sleep (DRAWSPEED);
         }
@@ -197,7 +197,7 @@ void printFrom(WINDOW* whatWindow, int row, int column, char* text)
 	{
 		mvwprintw(whatWindow, row, column + i, "%c", text[i]);
 		wrefresh(whatWindow);
-		Sleep (DRAWSPEED);
+		Sleep (DRAWSPEED/2);
 	}
 	/*Move the cursor back to the place where it was*/
 	move (curY, curX);
@@ -432,7 +432,6 @@ void printCenter(WINDOW* whatWindow, int line, char* whatToPrint, int wantToAnim
 
 	length = stringLength(whatToPrint);
 	origin = (XMAX-XMIN)/2 - (length/2);
-
 	/*Print it on the center of chosen line*/
 	if (wantToAnim == 1)
     {
@@ -451,7 +450,7 @@ void printCenter(WINDOW* whatWindow, int line, char* whatToPrint, int wantToAnim
         }
         wrefresh(whatWindow);
     }
-    move(line + XMIN, origin + i);
+    move(line+1, origin+i);
 }
 /*End of printCenter*/
 
@@ -460,12 +459,11 @@ void clearLine(WINDOW* whatWindow, int whichLine)
 {
 	int i = 0;
 
-	move(whichLine, XMIN);
+	wmove(whatWindow, whichLine, XMIN);
 	for (i = 0; i <= XMAX-XMIN; i++)
 	{
 		wprintw(whatWindow, " ");
 	}
-	wrefresh(whatWindow);
 }
 /*End of clearLine*/
 
@@ -496,6 +494,113 @@ void silenceOff()
 	curs_set(1);
 }
 /*End of silenceOff*/
+
+/*Entered text will slide apart in two directions from the center of a window*/
+/*Specifying variableType is needed in C language, unfortunately*/
+int writeCenter(WINDOW* whatWindow, int line, char* saveToThis)
+{
+    if (line > YMAX)
+    {
+        perror("'line' out of window boundaries");
+        DC(line);
+        assert(!TRUE);
+    }
+
+    silenceOn();
+
+    char input, tempArray[WIDTH_WIN];
+    memset(tempArray, '\0', sizeof(tempArray));
+    int i = 0;
+
+    while (i < WIDTH_WIN)
+    {
+        flushinp();
+        input = getch();
+        if (input == ESC)
+        {
+            /*Clear variable*/
+            memset (tempArray, '\0', sizeof(tempArray));
+            wipeAnimation(whatWindow, DOWN);
+            printCenter(whatWindow, 4, "Passing value has been aborted", 1);
+            waitingArrows(whatWindow, 7);
+            wipeAnimation(whatWindow, DOWN);
+            return FALSE;
+        }
+        else if (input == ENTER)
+        {
+            break;
+        }
+        /*If BCKSPC has been pressed*/
+        else if (input == BSP)
+        {
+            /*Check if not reached zero-pos char yet*/
+            if (i > 0)
+            {
+                /*Delete last star and back one step*/
+                i--;
+                tempArray[i] = '\0';
+                clearLine(whatWindow, line);
+                mvwprintw(whatWindow, line, XMAX/2 - (i/2), tempArray);
+            }
+        }
+        else
+        {
+            tempArray[i] = input;
+            i++;
+            clearLine(whatWindow, line);
+            mvwprintw(whatWindow, line, XMAX/2 - (i/2), tempArray);
+        }
+        wrefresh(whatWindow);
+    }
+    strcpy (saveToThis, tempArray);
+
+    return TRUE;
+}
+/*End of writeCenter*/
+
+/*This will display arrows animation while waiting for input*/
+void waitingArrows(WINDOW* whatWindow, int line)
+{
+    silenceOn();
+    int t = 0;
+    flushinp();
+    /*Don't wait on getch()*/
+    nodelay(stdscr, TRUE);
+    while (1 == 1)
+    {
+        if (getch() == 13)
+            break;
+        Sleep(DRAWSPEED*3);
+        if (t > 7)
+            t = 0;
+        switch(t)
+        {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            {
+                mvwprintw(whatWindow, line, (XMAX/2 + 10) + t * 2, ">");
+                wrefresh(whatWindow);
+                break;
+            }
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            {
+                mvwprintw(whatWindow, line, (XMAX/2 + 10) + (t - 4) * 2, " ");
+                wrefresh(whatWindow);
+            }
+        }
+        t++;
+    }
+    nodelay(stdscr, FALSE);
+    silenceOff();
+    clearLine(whatWindow, line);
+	wrefresh(whatWindow);
+}
+/*End of waitingArrows*/
 
 /*In order to get rid of EXIT path from deepest functions to the main*/
 void closeProg()

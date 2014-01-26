@@ -15,9 +15,12 @@
 #define DRAWSPEED   20
 #define UP          1
 #define DOWN        2
-#define LEFT        1
-#define RIGHT       2
-#define DATABSIZE   99
+#define LEFT        3
+#define RIGHT       4
+#define DATABSIZE   50
+#define ESC         27
+#define ENTER       13
+#define BSP         8
 
 typedef struct
 {
@@ -47,7 +50,7 @@ void updateInteractif();
 int getMove(int);
 void loadMap(char*);
 void interpretBoard();
-int pAAction(int);
+void pAAction(int);
 void switchMap(char*);
 int teleport(int);
 int checkAction(int);
@@ -68,39 +71,46 @@ void initializeData();
 void f_printData(int, int, int, char*);
 void scrollData(int);
 void activateDatabase(database_t);
-int f_filterData(int, char*, int, char*);
+int filterData(int, char*, int, char*);
 void sortData(int, int);
 void copyData(int);
 void cAAppearance(int, int);
 int cMAttribute(int, int, int, int);
 int cMAppearance(int, int, int, char);
 int useDoor(int, int);
+int openDoor(int, int);
+int closeDoor(int, int);
 int returnAttribute(int);
 char returnVisible(int);
-int pMAction(int);
+void pMAction(int);
+void waitingArrows(WINDOW*, int);
+int writeCenter(WINDOW*, int, char*);
+void f_passValue(char*, int*);
+void loadGlobalActions(char*);
+int f_returnACharPos(int, char);
+void mapConditions();
+void cAAttribute(int, int);
 
 #define draw(a)                 f_draw(#a)
 #define update(a)               f_update(#a)
 #define printData(a,b,c,d)      f_printData(a,b,c,#d)
-#define filterData(a,b,c,d)     f_filterData(a,#b,c,#d)
+#define returnACharPos(a,b)     f_returnACharPos(a,#b)
+#define passValue(a,b)          f_passValue(#a,b)
 
 #define XMIN                    getbegx(whatWindow)
 #define XMAX                    getmaxx(whatWindow)
 #define YMIN                    getbegy(whatWindow)
 #define YMAX                    getmaxy(whatWindow)
 
-extern char visibleMap[HEIGHT_INT][WIDTH_WIN+1];
-extern char board[HEIGHT_INT][WIDTH_WIN+1];
-extern char mapName[20];
+extern char visibleMap[HEIGHT_INT][WIDTH_WIN+1], board[HEIGHT_INT][WIDTH_WIN+1], mapName[20];
 extern int attributeMap[HEIGHT_INT][WIDTH_WIN];
-extern point charPos;
-extern point nextPos;
-extern WINDOW *interactif_win;
-extern WINDOW *sort_win;
-extern database_t movies_database;
-extern database_t current_database;
-extern database_t filtered_database;
+extern point charPos, nextPos;
+extern WINDOW *interactif_win, *sort_win;
+extern database_t movies_database, current_database, filtered_database;
 extern int firstVisRow, lastRow;
+extern int action1, action2;
+extern char v_column1[70], v_column3[70], v_column2[70], v_column4[70], v_column5[70];
+extern int v_order;
 
 /*Check what's inside numerical (D), string (S) variable and e.t.c.*/
 #define DC(Var)     (mvprintw(23, 4, "vCheck: " #Var " = %d", Var));getch();clearLine(stdscr, 23);wrefresh(stdscr);
@@ -137,5 +147,23 @@ extern int firstVisRow, lastRow;
 #define F           22
 #define G           23
 #define H           24
+#define I           25
+#define J           26
+#define K           27
+#define L           28
+#define M           29
+#define N           30
+#define O           31
+#define P           32
+#define Q           33
+#define R           34
+#define S           35
+#define T           36
+#define U           37
+#define V           38
+#define W           39
+#define X           40
+#define Y           41
+#define Z           42
 
 #endif

@@ -144,11 +144,11 @@ void activateDatabase(database_t whatDatabase)
         current_database.column5[i] = whatDatabase.column5[i];
         strcpy (current_database.column5_title, whatDatabase.column5_title);
 
+        /*Manage how far can scroll go (if is less than 10 lines, it should not be able to scroll*/
+        /*Is also helpful in other stuff*/
         if (whatDatabase.column1[i] != 0)
             lastRow++;
     }
-    /*Manage how far can scroll go (if is less than 10 lines, it should not be able to scroll*/
-    /*Is also helpful in other stuff*/
 }
 /*End of activateDatabase*/
 
@@ -214,12 +214,12 @@ void f_printData(int whatColumn, int rowInFile, int rowInWindow, char* whatToPri
 
         if (strcmp (whatToPrint, "data") == 0)
         {
-            mvwprintw(whatWindow, rowInWindow, x, "                                          ");
-            if (stringLength(current_database.column2[rowInFile]) >= 41)
+            mvwprintw(whatWindow, rowInWindow, x, "                                       ");
+            if (stringLength(current_database.column2[rowInFile]) >= 37)
             {
                 int i;
 
-                for (i = 0; i <= 40; i++)
+                for (i = 0; i <= 37; i++)
                 {
                     goingToPrint[i] = current_database.column2[rowInFile][i];
                 }
@@ -239,7 +239,7 @@ void f_printData(int whatColumn, int rowInFile, int rowInWindow, char* whatToPri
     }
     else if (whatColumn == 3)
     {
-        x = 50;
+        x = 47;
         if (strcmp (whatToPrint, "data") == 0)
         {
             mvwprintw(whatWindow, rowInWindow, x, "    ");
@@ -257,7 +257,7 @@ void f_printData(int whatColumn, int rowInFile, int rowInWindow, char* whatToPri
     }
     else if (whatColumn == 4)
     {
-        x = 57;
+        x = 56;
         if (strcmp (whatToPrint, "data") == 0)
         {
             mvwprintw(whatWindow, rowInWindow, x, "  ");
@@ -268,17 +268,17 @@ void f_printData(int whatColumn, int rowInFile, int rowInWindow, char* whatToPri
         {
             char goingToPrint[80];
             strcpy (goingToPrint, current_database.column4_title);
-            mvwprintw(whatWindow, rowInWindow, x, "%s", goingToPrint);
+            mvwprintw(whatWindow, rowInWindow, x-2, "%s", goingToPrint);
         }
         else
             assert(!TRUE);
     }
     else if (whatColumn == 5)
     {
-        x = 66;
+        x = 67;
         if (strcmp (whatToPrint, "data") == 0)
         {
-            mvwprintw(whatWindow, rowInWindow, x, "  ");
+            mvwprintw(whatWindow, rowInWindow, x, "      ");
             float goingToPrint = current_database.column5[rowInFile];
             mvwprintw(whatWindow, rowInWindow, x, "%1.1f", goingToPrint);
         }
@@ -286,7 +286,7 @@ void f_printData(int whatColumn, int rowInFile, int rowInWindow, char* whatToPri
         {
             char goingToPrint[80];
             strcpy (goingToPrint, current_database.column5_title);
-            mvwprintw(whatWindow, rowInWindow, x, "%s", goingToPrint);
+            mvwprintw(whatWindow, rowInWindow, x-4, "%s", goingToPrint);
         }
         else
             assert(!TRUE);
@@ -533,12 +533,8 @@ void sortData(int whichCol, int order)
 /*End of sortData*/
 
 /*This function will leave only lines with chosen values*/
-int f_filterData(int col1, char* value1, int col2, char* value2)
+int filterData(int col1, char* value1, int col2, char* value2)
 {
-    /*Check if not provided same columns*/
-    if (col1 == col2)
-        return FALSE;
-
     int i = 0, line;
 
     if (col1 == 1)
@@ -552,22 +548,7 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
             if (movies_database.column1[line] == searchFor1)
             {
                 /*Now check the value2 in col2 in current line*/
-                if (col2 == 1)
-                {
-                    int searchFor2 = atoi(value2);
-                    /*If found chosen value2 in column2*/
-                    if (movies_database.column1[line] == searchFor2)
-                    {
-                        /*Copy those values to newly created structure*/
-                        filtered_database.column1[i] = movies_database.column1[line];
-                        strcpy (filtered_database.column2[i], movies_database.column2[line]);
-                        filtered_database.column3[i] = movies_database.column3[line];
-                        filtered_database.column4[i] = movies_database.column4[line];
-                        filtered_database.column5[i] = movies_database.column5[line];
-                        i++;
-                    }
-                }
-                else if (col2 == 2)
+                if (col2 == 2)
                 {
                     /*If found chosen value2 in column2*/
                     if (strcmp (movies_database.column2[line], value2) == 0)
@@ -643,20 +624,6 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
                     int searchFor2 = atoi(value2);
                     /*If found chosen value2 in column2*/
                     if (movies_database.column1[line] == searchFor2)
-                    {
-                        /*Copy those values to newly created structure*/
-                        filtered_database.column1[i] = movies_database.column1[line];
-                        strcpy (filtered_database.column2[i], movies_database.column2[line]);
-                        filtered_database.column3[i] = movies_database.column3[line];
-                        filtered_database.column4[i] = movies_database.column4[line];
-                        filtered_database.column5[i] = movies_database.column5[line];
-                        i++;
-                    }
-                }
-                else if (col2 == 2)
-                {
-                    /*If found chosen value2 in column2*/
-                    if (strcmp (movies_database.column2[line], value2) == 0)
                     {
                         /*Copy those values to newly created structure*/
                         filtered_database.column1[i] = movies_database.column1[line];
@@ -755,21 +722,6 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
                         i++;
                     }
                 }
-                else if (col2 == 3)
-                {
-                    int searchFor2 = atoi(value2);
-                    /*If found chosen value2 in column2*/
-                    if (movies_database.column3[line] == searchFor2)
-                    {
-                        /*Copy those values to newly created structure*/
-                        filtered_database.column1[i] = movies_database.column1[line];
-                        strcpy (filtered_database.column2[i], movies_database.column2[line]);
-                        filtered_database.column3[i] = movies_database.column3[line];
-                        filtered_database.column4[i] = movies_database.column4[line];
-                        filtered_database.column5[i] = movies_database.column5[line];
-                        i++;
-                    }
-                }
                 else if (col2 == 4)
                 {
                     float searchFor2 = atof(value2);
@@ -848,21 +800,6 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
                     int searchFor2 = atoi(value2);
                     /*If found chosen value2 in column2*/
                     if (movies_database.column3[line] == searchFor2)
-                    {
-                        /*Copy those values to newly created structure*/
-                        filtered_database.column1[i] = movies_database.column1[line];
-                        strcpy (filtered_database.column2[i], movies_database.column2[line]);
-                        filtered_database.column3[i] = movies_database.column3[line];
-                        filtered_database.column4[i] = movies_database.column4[line];
-                        filtered_database.column5[i] = movies_database.column5[line];
-                        i++;
-                    }
-                }
-                else if (col2 == 4)
-                {
-                    float searchFor2 = atof(value2);
-                    /*If found chosen value2 in column2*/
-                    if (movies_database.column4[line] == searchFor2)
                     {
                         /*Copy those values to newly created structure*/
                         filtered_database.column1[i] = movies_database.column1[line];
@@ -961,21 +898,6 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
                         i++;
                     }
                 }
-                else if (col2 == 5)
-                {
-                    float searchFor2 = atof(value2);
-                    /*If found chosen value2 in column2*/
-                    if (movies_database.column5[line] == searchFor2)
-                    {
-                        /*Copy those values to newly created structure*/
-                        filtered_database.column1[i] = movies_database.column1[line];
-                        strcpy (filtered_database.column2[i], movies_database.column2[line]);
-                        filtered_database.column3[i] = movies_database.column3[line];
-                        filtered_database.column4[i] = movies_database.column4[line];
-                        filtered_database.column5[i] = movies_database.column5[line];
-                        i++;
-                    }
-                }
             }
         }
     }
@@ -984,9 +906,13 @@ int f_filterData(int col1, char* value1, int col2, char* value2)
 
     /*If found at least one matching data*/
     if (i != 0)
-        return TRUE;
+    {
+        activateDatabase(filtered_database);
+        initializeData();
+    }
+
 
     /*If not found anything*/
     return FALSE;
 }
-/*End of f_filterData*/
+/*End of filterData*/

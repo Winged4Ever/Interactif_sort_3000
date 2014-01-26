@@ -9,22 +9,32 @@ clear
 #                                                                            #
 ##############################################################################
 menu
-##############################################################################
-#                           A - run sort window                              #
-#       #                   B - working teleport                             #
-###        testing          C - exit                              $ $$$      #
-#3    # @ 1<-+area                                                $  1$      #
-###                                                               $$$$$      #
-#       #                    you can walk on me                              #
-#2                                                                          2#
-##############################################################################
-database
-##############################################################################
-#                                                    scroll up               #
-#                                                       ###                  #
-#                                                       #1#                  #
-#       5                             @                  2                   #
-#    ###D###                                            #3#                  #
-#    #  5  #                                            ###                  #
-#    #     #                                        scroll down              #
-##############################################################################
+               ####################         $$$$$$$$$$$$$$$$                  
+         ########                 #         $4<-----------3$                  
+         #          sorting----+  #######   $$$$$$$$$$$$$$$$                  
+        #  +-------+           |        #                                     
+        #  |  +---+    @       +--->2   ##################################    
+        #  v  |                                                           #   
+        #  1  +-----filtering        exit------------------------------>3  #  
+        #                                                                   # 
+        ######################################################################
+sorting
+                                        #########################             
+    first choose order:                 #   #U#      scroll up  #             
+    I - increasing                      # 1             ###     #             
+    D - decreasing                      # 2      ##     #A#     #             
+    then choose column (1-5)            # 3      @ #O    B      #             
+    and then use 'O' letter             # 4      ##     #C#     #             
+    to display the result               # 5             ###     #             
+    use X to head back to menu          #   #D#     scroll down #             
+                                        #########################             
+filtering
+        # #  #########         #############  choose one column first         
+     ###V#B###9      ########### scroll up #  by entering on one of digits    
+     #    8  #####   T         Y    ###    #  then pass chosen value          
+     # ###W# #   R   ###########    #1#    #  and then choose next column     
+    #C #U#I#6E6  ##### filter #      2     #  you will be prompted again      
+     # #Q### ### ### stage   #      #3#    #  after that, head to digit '9'   
+     #  7    #@  #O##########  #    ###    #  the database will be filtered   
+     ###X#Z#####              ##scroll down#  if you want to reset values     
+        # #    ############### #############  use 'O' character               
